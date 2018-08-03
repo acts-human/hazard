@@ -1,0 +1,11 @@
+#!/bin/bash
+
+docker rm -f hazard-loader
+docker build -t hazard-loader .
+docker run \
+       -d \
+       --rm \
+       --name hazard-loader \
+       hazard-loader
+docker logs -f hazard-loader
+
