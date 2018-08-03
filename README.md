@@ -49,6 +49,7 @@ Prerequisites
   ```
 
 * Ensure vm.max_map_count >= 262144 https://www.elastic.co/guide/en/elasticsearch/reference/6.3/docker.html#docker-cli-run-prod-mode
+
   ```
   $ grep vm.max_map_count /etc/sysctl.conf
   vm.max_map_count=262144
@@ -57,6 +58,32 @@ Prerequisites
   ```
   sysctl -w vm.max_map_count=262144
   ```
+
+* AWS CLI https://docs.aws.amazon.com/cli/latest/userguide/installing.html with credentials in `~/.aws/credentials`
+
+  ```
+  $ pip install awscli --upgrade --user
+  $ aws --version
+  aws-cli/1.15.71 Python/2.7.12 Linux/4.15.0-29-generic botocore/1.10.70
+
+  $ aws configure
+  AWS Access Key ID [None]: XXXXXXXXXXX
+  AWS Secret Access Key [None]: XXXXXXXXXXXXXXX
+  Default region name [None]: us-west-2
+  Default output format [None]: json
+
+  $ cat ~/.aws/credentials 
+  [default]
+  aws_access_key_id = XXXXXXXXXXXXX
+  aws_secret_access_key = XXXXXXXXXXXXX
+
+  $ cat ~/.aws/config 
+  [default]
+  output = json
+  region = us-west-2
+  ```
+
+
 
 Running Locally
 ---------------
