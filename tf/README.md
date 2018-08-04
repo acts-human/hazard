@@ -1,9 +1,9 @@
 Hazard Infrastructure
 =====================
 
-Terraform configuration for deploying Hazard to AWS ECS.
+Deploy to AWS ECS Fargate with Terraform.
 
-TODO
-----
+External Modules
+----------------
 
-* Split up main.tf into multiple files.
+* Terraform AWS VPC https://github.com/terraform-aws-modules/terraform-aws-vpc

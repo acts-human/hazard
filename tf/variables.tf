@@ -1,36 +1,12 @@
-variable "region" {
+variable "AWS_REGION" {
   description = "The AWS region."
-  default = "us-west-2"
+  default     = "us-west-2"
 }
 
-variable "availability_zone" {
-  description = "The AWS availability zone inside the AWS region."
-  default = "us-west-2a"
+variable "CIDR_PRIVATE" {
+  default = "10.0.1.0/24,10.0.2.0/24"
 }
 
-variable "autoscale_min" {
-  default = "1"
-  description = "Minimum autoscale (number of EC2)"
+variable "CIDR_PUBLIC" {
+  default = "10.0.101.0/24,10.0.102.0/24"
 }
-
-variable "autoscale_max" {
-  default = "3"
-  description = "Maximum autoscale (number of EC2)"
-}
-
-variable "autoscale_desired" {
-  default = "2"
-  description = "Desired autoscale (number of EC2)"
-}
-
-variable "instance_type" {
-  default = "t2.micro"
-}
-
-variable "amis" {
-  description = "Which AMI to spawn. Defaults to the AWS ECS optimized images."
-  default = {
-    us-west-2 = "ami-f189d189"
-  }
-}
-
