@@ -1,18 +1,3 @@
-resource "aws_alb" "hazard_web" {
-  name = "hazard-web-alb"
-  internal = false
-
-  security_groups = [
-    "${aws_security_group.ecs.id}",
-    "${aws_security_group.alb.id}",
-  ]
-
-  subnets = [
-    "${module.base_vpc.public_subnets[0]}",
-    "${module.base_vpc.public_subnets[1]}"
-  ]
-}
-
 resource "aws_alb_target_group" "hazard_web" {
   name = "hazard-web-alb-tg"
   protocol = "HTTP"
@@ -26,7 +11,7 @@ resource "aws_alb_target_group" "hazard_web" {
 }
 
 resource "aws_alb_listener" "hazard_web" {
-  load_balancer_arn = "${aws_alb.hazard_web.arn}"
+  load_balancer_arn = "${aws_alb.hazard.arn}"
   port = "80"
   protocol = "HTTP"
 
@@ -38,22 +23,19 @@ resource "aws_alb_listener" "hazard_web" {
   depends_on = ["aws_alb_target_group.hazard_web"]
 }
 
-output "alb_dns_name" {
-  value = "${aws_alb.hazard_web.dns_name}"
-}
-
 data "template_file" "hazard_web" {
   template = "${file("res/ecs-task-hazard-web.json.tpl")}"
   vars {
-    IMAGE      = "medic30420/hazard-web:latest"
-    AWS_REGION = "${var.AWS_REGION}"
+    IMAGE          = "medic30420/hazard-web:latest"
+    AWS_REGION     = "${var.AWS_REGION}"
+    LOG_GROUP      = "${aws_cloudwatch_log_group.hazard.name}"
   }
 }
 
 resource "aws_ecs_task_definition" "hazard_web" {
   family                   = "hazard-web"
   requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc" # TODO: duplicated in json task def
+  network_mode             = "awsvpc"
   cpu                      = 256
   memory                   = 512
   container_definitions    = "${data.template_file.hazard_web.rendered}"

@@ -2,18 +2,20 @@
   {
     "name": "hazard-web",
     "image": "${IMAGE}",
-    "networkMode": "awsvpc",
     "essential": true,
     "portMappings": [
-      {
-        "containerPort": 22,
-        "hostPort": 22
-      },
       {
         "containerPort": 3000,
         "hostPort": 3000
       }
-    ]
-
+    ],
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "${LOG_GROUP}",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "ecs"
+        }
+    }
   }
 ]

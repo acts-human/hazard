@@ -1,5 +1,11 @@
 provider "aws" {
   region = "${var.AWS_REGION}"
+  version = "~> 1.30"
+}
+
+provider "template" {
+  version = "~> 1.0"
+  alias = "default"
 }
 
 module "base_vpc" {
@@ -62,4 +68,28 @@ resource "aws_security_group" "alb" {
 
 resource "aws_ecs_cluster" "fargate" {
   name = "hazard"
+}
+
+resource "aws_alb" "hazard" {
+  name = "hazard-alb"
+  internal = false
+
+  security_groups = [
+    "${aws_security_group.ecs.id}",
+    "${aws_security_group.alb.id}",
+  ]
+
+  subnets = [
+    "${module.base_vpc.public_subnets[0]}",
+    "${module.base_vpc.public_subnets[1]}"
+  ]
+}
+
+output "alb_dns_name" {
+  value = "${aws_alb.hazard.dns_name}"
+}
+
+resource "aws_cloudwatch_log_group" "hazard" {
+  name = "/ecs/hazard"
+  retention_in_days = 30
 }
