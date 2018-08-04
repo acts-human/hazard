@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
-import elasticsearch from "elasticsearch";
+import axios from 'axios';
 import logo from './logo.svg';
 import './App.css';
 
-let client = new elasticsearch.Client({
-  host: "localhost:9200",
-  log: "trace"
-});
+const V1_HAZARD_SEARCH_URL = process.env.REACT_APP_API_BASE_URL + "/api/v1/hazards/search";
+
 
 class App extends Component {
   constructor(props) {
@@ -16,22 +14,20 @@ class App extends Component {
   }
 
   handleChange(event) {
-    const search_query = event.target.value;
-    client
-      .search({
-        index: 'earthquake',
-        q: search_query
-      })
-      .then(
-        function(body) {
-          console.log(body);
-          this.setState({ results: body.hits.hits });
-        }.bind(this),
-        function(error) {
-          console.trace(error.message);
-        }
-      );
+    let query = event.target.value;
+    
+    axios.get(V1_HAZARD_SEARCH_URL, {
+      params: {
+        q: query
+      }
+    }).then(res => {
+      console.log(JSON.stringify(res.data));
+      this.setState({ results: res.data.items });
+    }).catch(err => {
+      console.trace(err.message);
+    });
   }
+  
   render() {
     return (
       <div className="App">
@@ -54,18 +50,18 @@ class App extends Component {
 class SearchResults extends Component {
   render() {
     const results = this.props.results || [];
-
+    let items = results.map(item => {
+      return (
+          <li key={item.toString()}>{item}</li>
+      );
+    });
     return (
       <div className="search_results">
         <hr />
         <ul>
-        {results.map(result => {
-          return (
-            <li key={result._id}>
-              {result._source.magnitude} {result._source.place}
-            </li>
-          );
-        })}
+        {
+          items
+        }
         </ul>
       </div>
     );

@@ -34,6 +34,15 @@ services:
       context: ./web
     ports:
       - 3000:3000
+    environment:
+      - REACT_APP_API_BASE_URL=http://localhost:10010
+    networks:
+      - hazardnet
+  api:
+    build:
+      context: ./api
+    ports:
+      - 10010:10010
     networks:
       - hazardnet
 
