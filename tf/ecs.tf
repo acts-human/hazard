@@ -17,6 +17,8 @@ module "base_vpc" {
   public_subnets     = ["${split(",", var.CIDR_PUBLIC)}"]
   enable_nat_gateway = true
   single_nat_gateway = true
+  default_vpc_enable_dns_hostnames = true
+  default_vpc_enable_dns_support = true
 }
 
 resource "aws_security_group" "ecs" {

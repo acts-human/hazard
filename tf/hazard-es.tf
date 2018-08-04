@@ -1,62 +1,55 @@
-resource "aws_alb_target_group" "hazard_es" {
-  name = "hazard-es-alb-tg"
-  protocol = "HTTP"
-  port = "9200"
-  vpc_id = "${module.base_vpc.vpc_id}"
-  target_type = "ip"
+data "aws_region" "current" {}
+
+data "aws_caller_identity" "current" {}
+
+resource "aws_iam_service_linked_role" "es" {
+  aws_service_name = "es.amazonaws.com"
 }
 
-resource "aws_alb_listener" "hazard_es" {
-  load_balancer_arn = "${aws_alb.hazard.arn}"
-  port = "9200"
-  protocol = "HTTP"
+resource "aws_elasticsearch_domain" "hazard" {
+  domain_name           = "hazard"
+  elasticsearch_version = "6.2"
 
-  default_action {
-    target_group_arn = "${aws_alb_target_group.hazard_es.arn}"
-    type = "forward"
+  ebs_options {
+    ebs_enabled = true
+    volume_size = 10
   }
 
-  depends_on = ["aws_alb_target_group.hazard_es"]
-}
-
-data "template_file" "hazard_es" {
-  template = "${file("res/ecs-task-hazard-es.json.tpl")}"
-  vars {
-    IMAGE          = "medic30420/hazard-es:latest"
-    AWS_REGION     = "${var.AWS_REGION}"
-    LOG_GROUP      = "${aws_cloudwatch_log_group.hazard.name}"
-  }
-}
-
-resource "aws_ecs_task_definition" "hazard_es" {
-  family                   = "hazard-es"
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
-  cpu                      = 2048
-  memory                   = 4096
-  container_definitions    = "${data.template_file.hazard_es.rendered}"
-  execution_role_arn       = "${aws_iam_role.ecs_task_assume.arn}"
-}
-
-resource "aws_ecs_service" "hazard_es" {
-  name            = "hazard-es"
-  cluster         = "${aws_ecs_cluster.fargate.id}"
-  launch_type     = "FARGATE"
-  task_definition = "${aws_ecs_task_definition.hazard_es.arn}"
-  desired_count   = 1
-
-  network_configuration = {
-    subnets = ["${module.base_vpc.private_subnets[0]}"]
-    security_groups = ["${aws_security_group.ecs.id}"]
+  cluster_config {
+    instance_type = "t2.small.elasticsearch"
+    instance_count = 1
   }
 
-  load_balancer {
-   target_group_arn = "${aws_alb_target_group.hazard_es.arn}"
-   container_name = "hazard-es"
-   container_port = 9200
+  advanced_options {
+    "rest.action.multi.allow_explicit_index" = "true"
   }
 
-  depends_on = [
-    "aws_alb_listener.hazard_es"
+  snapshot_options {
+    automated_snapshot_start_hour = 23
+  }
+
+  vpc_options {
+    security_group_ids = ["${aws_security_group.ecs.id}"]
+    subnet_ids = ["${module.base_vpc.private_subnets[0]}"]
+  }
+
+  access_policies = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": [
+          "*"
+        ]
+      },
+      "Action": [
+        "es:*"
+      ],
+      "Resource": "arn:aws:es:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:domain/hazard/*"
+    }
   ]
+}
+EOF
 }

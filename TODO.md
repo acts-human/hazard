@@ -1,7 +1,6 @@
 TODO
 ====
 
-* fix hazard-es service
-  * Logging
 * deploy hazard-loader
+* put hazard-es inside VPC
 * AWS Code Pipelines
