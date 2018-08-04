@@ -6,24 +6,37 @@
     "portMappings": [
       {
         "containerPort": 9200,
-        "hostPort": 9200
+        "hostPort": 9200,
+        "protocol": "tcp"
+      },
+      {
+        "hostPort": 9300,
+        "containerPort": 9300,
+        "protocol": "tcp"
       }
     ],
     "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "${LOG_GROUP}",
-          "awslogs-region": "${AWS_REGION}",
-          "awslogs-stream-prefix": "ecs"
-        }
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${LOG_GROUP}",
+        "awslogs-region": "${AWS_REGION}",
+        "awslogs-stream-prefix": "ecs"
+      }
     },
     "ulimits": [
       {
         "name": "nofile",
         "softLimit": 65536,
         "hardLimit": 65536
+      },
+      {
+        "name": "memlock",
+        "softLimit": -1,
+        "hardLimit": -1
       }
     ],
+    "cpu": 1024,
+    "memory": 2048,
     "environment": [
       { "name": "cluster.name", "value": "hazard" },
       { "name": "bootstrap.memory_lock", "value": "true" },

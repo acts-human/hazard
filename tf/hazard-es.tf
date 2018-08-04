@@ -4,10 +4,6 @@ resource "aws_alb_target_group" "hazard_es" {
   port = "9200"
   vpc_id = "${module.base_vpc.vpc_id}"
   target_type = "ip"
-
-  health_check {
-    path = "/"
-  }
 }
 
 resource "aws_alb_listener" "hazard_es" {
@@ -36,8 +32,8 @@ resource "aws_ecs_task_definition" "hazard_es" {
   family                   = "hazard-es"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = 256
-  memory                   = 1024
+  cpu                      = 2048
+  memory                   = 4096
   container_definitions    = "${data.template_file.hazard_es.rendered}"
   execution_role_arn       = "${aws_iam_role.ecs_task_assume.arn}"
 }
