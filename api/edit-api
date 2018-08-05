@@ -1,0 +1,2 @@
+#!/bin/bash
+swagger project edit -p 42441 --host 0.0.0.0 -s

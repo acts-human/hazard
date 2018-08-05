@@ -44,12 +44,16 @@ paths:
 definitions:
   HazardSearchResponse:
     required:
-      - items
+      - hits
     properties:
-      items:
-        type: array
-        items:
-          type: string
+      took:
+        type: number
+      timed_out:
+        type: boolean
+      _shards:
+        type: object
+      hits:
+        type: object
   ErrorResponse:
     required:
       - message

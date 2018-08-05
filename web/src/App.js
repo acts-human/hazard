@@ -22,7 +22,7 @@ class App extends Component {
       }
     }).then(res => {
       console.log(JSON.stringify(res.data));
-      this.setState({ results: res.data.items });
+      this.setState({ results: res.data.hits.hits });
     }).catch(err => {
       console.trace(err.message);
     });
@@ -52,7 +52,7 @@ class SearchResults extends Component {
     const results = this.props.results || [];
     let items = results.map(item => {
       return (
-          <li key={item.toString()}>{item}</li>
+          <li key={item._id}>{item._source.magnitude}M {item._source.place}</li>
       );
     });
     return (
