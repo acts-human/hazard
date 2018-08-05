@@ -43,6 +43,8 @@ services:
       context: ./api
     ports:
       - 10010:10010
+    environment:
+      - ES_HOST=http://es:9200
     networks:
       - hazardnet
 
