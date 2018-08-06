@@ -26,9 +26,10 @@ resource "aws_alb_listener" "hazard_web" {
 data "template_file" "hazard_web" {
   template = "${file("res/ecs-task-hazard-web.json.tpl")}"
   vars {
-    IMAGE          = "medic30420/hazard-web:latest"
-    AWS_REGION     = "${var.AWS_REGION}"
-    LOG_GROUP      = "${aws_cloudwatch_log_group.hazard.name}"
+    IMAGE                  = "medic30420/hazard-web:latest"
+    REACT_APP_API_BASE_URL = "http://${aws_alb.hazard.dns_name}:${aws_alb_listener.hazard_api.port}"
+    AWS_REGION             = "${var.AWS_REGION}"
+    LOG_GROUP              = "${aws_cloudwatch_log_group.hazard.name}"
   }
 }
 

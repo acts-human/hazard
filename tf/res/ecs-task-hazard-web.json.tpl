@@ -9,6 +9,9 @@
         "hostPort": 3000
       }
     ],
+    "environment": [
+      { "name": "REACT_APP_API_BASE_URL", "value": "${REACT_APP_API_BASE_URL}" }
+    ],
     "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
